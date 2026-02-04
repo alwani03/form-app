@@ -851,6 +851,194 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Role Menus",
+			"item": [
+				{
+					"name": "List Role Menus",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/role-menus",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"role-menus"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Optional search by role name or menu name"
+								},
+								{
+									"key": "role_id",
+									"value": "",
+									"description": "Optional filter by role_id"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Role Menu",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role_id\": 1,\n    \"menu_id\": 1,\n    \"is_active\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/role-menus",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"role-menus"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Show Role Menu",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/role-menus/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"role-menus",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Role Menu",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role_id\": 1,\n    \"menu_id\": 1,\n    \"is_active\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/role-menus/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"role-menus",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Role Menu",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/role-menus/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"role-menus",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"variable": [
