@@ -103,6 +103,7 @@ class DepartmentController extends Controller
 
         $department->update([
             'department_name' => $request->department_name,
+            'updated_by' => Auth::id(),
         ]);
 
         // Log Activity
@@ -129,6 +130,9 @@ class DepartmentController extends Controller
         }
 
         $department_name = $department->department_name;
+        
+        // Update deleted_by before deleting
+        $department->update(['deleted_by' => Auth::id()]);
         $department->delete();
 
         // Log Activity
