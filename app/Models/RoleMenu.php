@@ -12,4 +12,14 @@ class RoleMenu extends Pivot
     protected $table = 'role_menus';
     
     protected $guarded = ['id'];
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class);
+    }
 }
