@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MenuController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -23,4 +24,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // User Routes
     Route::apiResource('users', UserController::class);
+
+    // Menu Routes
+    Route::apiResource('menus', MenuController::class);
 });
