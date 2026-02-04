@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\LogActivity;
+use App\Enums\ActivityType;
 use Illuminate\Support\Facades\Cookie;
 
 class AuthController extends Controller
@@ -19,6 +21,11 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
            
+            // Log Activity
+            LogActivity::create([
+                'user_id' => $user->id,
+                'remark' => ActivityType::LOGIN->generateRemark('User', $user->username),
+            ]);
 
             $token = $user->createToken('auth_token')->plainTextToken;
             // Generate dummy cookie values as per image example (long hashes)
@@ -44,7 +51,15 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        // Log Activity before deleting token
+        if ($user = $request->user()) {
+            LogActivity::create([
+                'user_id' => $user->id,
+                'remark' => ActivityType::LOGOUT->generateRemark('User', $user->username),
+            ]);
+
+            $user->currentAccessToken()->delete();
+        }
         
         $cookie1 = cookie()->forget('HWE_PUSS');
         $cookie2 = cookie()->forget('HWE_USS');
