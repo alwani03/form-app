@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Enums\ActivityType;
-use App\Services\LogActivityService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
     public function __construct(
-        protected LogActivityService $logActivityService
+        protected UserService $userService
     ) {}
 
     /**
@@ -21,22 +17,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::with(['role', 'department']);
-        $remark = $this->logActivityService->generateRemark(ActivityType::LIST, 'Users');
-
-        if ($request->has('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('username', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            });
-            $remark = $this->logActivityService->generateRemark(ActivityType::SEARCH, 'User', "Keyword: {$search}");
-        }
-
-        // Log Activity
-        $this->logActivityService->log($remark);
-
-        $users = $query->paginate(10);
+        $users = $this->userService->paginate($request->search ?? null, 10);
         
         return response()->json([
             'message' => 'Users retrieved successfully',
@@ -49,7 +30,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'username' => 'required|string|max:255|unique:users',
             'password' => 'required|string|min:6',
             'email' => 'required|string|email|max:255|unique:users',
@@ -58,19 +39,7 @@ class UserController extends Controller
             'is_active' => 'boolean'
         ]);
 
-        $user = User::create([
-            'username' => $request->username,
-            'password' => Hash::make($request->password),
-            'email' => $request->email,
-            'role_id' => $request->role_id,
-            'department_id' => $request->department_id,
-            'is_active' => $request->is_active ?? true,
-            'created_by' => Auth::id(),
-        ]);
-
-        $this->logActivityService->log(
-            $this->logActivityService->generateRemark(ActivityType::CREATE, 'User', $user->username)
-        );
+        $user = $this->userService->create($validated);
 
         return response()->json([
             'message' => 'User created successfully',
@@ -83,15 +52,11 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = User::with(['role', 'department'])->find($id);
+        $user = $this->userService->find($id);
 
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
-
-        $this->logActivityService->log(
-            $this->logActivityService->generateRemark(ActivityType::READ, 'User', $user->username)
-        );
 
         return response()->json([
             'message' => 'User details',
@@ -104,12 +69,6 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-
         $request->validate([
             'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($id)],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($id)],
@@ -118,24 +77,11 @@ class UserController extends Controller
             'is_active' => 'boolean'
         ]);
 
-        $data = [
-            'username' => $request->username,
-            'email' => $request->email,
-            'role_id' => $request->role_id,
-            'department_id' => $request->department_id,
-            'is_active' => $request->is_active ?? $user->is_active,
-            'updated_by' => Auth::id(),
-        ];
+        $user = $this->userService->update($id, $request->all());
 
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
         }
-
-        $user->update($data);
-
-        $this->logActivityService->log(
-            $this->logActivityService->generateRemark(ActivityType::UPDATE, 'User', $user->username)
-        );
 
         return response()->json([
             'message' => 'User updated successfully',
@@ -148,18 +94,11 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::find($id);
+        $deleted = $this->userService->delete($id);
 
-        if (!$user) {
+        if (!$deleted) {
             return response()->json(['message' => 'User not found'], 404);
         }
-
-        $user->update(['deleted_by' => Auth::id()]);
-        $user->delete();
-
-        $this->logActivityService->log(
-            $this->logActivityService->generateRemark(ActivityType::DELETE, 'User', $user->username)
-        );
 
         return response()->json(['message' => 'User deleted successfully']);
     }
