@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Enums\ActivityType;
 use App\Services\LogActivityService;
 use App\Services\DepartmentService;
+use App\Http\Requests\StoreDepartmentRequest;
+use App\Http\Requests\UpdateDepartmentRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,13 +33,9 @@ class DepartmentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreDepartmentRequest $request)
     {
-        $request->validate([
-            'department_name' => 'required|string|max:255|unique:departments,department_name',
-        ]);
-
-        $department = $this->departmentService->create($request->department_name);
+        $department = $this->departmentService->create($request->validated()['department_name']);
 
         return response()->json([
             'message' => 'Department created successfully',
@@ -65,14 +63,10 @@ class DepartmentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(UpdateDepartmentRequest $request, $id)
     {
-        $request->validate([
-            'department_name' => 'required|string|max:255|unique:departments,department_name,' . $id,
-        ]);
-
         $department = $this->departmentService->update($id, [
-            'department_name' => $request->department_name
+            'department_name' => $request->validated()['department_name']
         ]);
 
         if (!$department) {
