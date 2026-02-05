@@ -9,11 +9,11 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\RoleMenuController;
 use App\Http\Controllers\FormRequestController;
+use App\Http\Controllers\DocumentTypeConfigController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
@@ -36,4 +36,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Form Request Routes
     Route::apiResource('form-requests', FormRequestController::class);
+
+    // Document Type Config Routes
+    Route::apiResource('document-type-configs', DocumentTypeConfigController::class);
 });
