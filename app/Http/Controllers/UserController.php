@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\LogActivity;
 use App\Enums\ActivityType;
+use App\Services\LogActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -12,13 +12,17 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    public function __construct(
+        protected LogActivityService $logActivityService
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         $query = User::with(['role', 'department']);
-        $remark = ActivityType::LIST->generateRemark('Users');
+        $remark = $this->logActivityService->generateRemark(ActivityType::LIST, 'Users');
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -26,14 +30,11 @@ class UserController extends Controller
                 $q->where('username', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
             });
-            $remark = ActivityType::SEARCH->generateRemark('User', "Keyword: {$search}");
+            $remark = $this->logActivityService->generateRemark(ActivityType::SEARCH, 'User', "Keyword: {$search}");
         }
 
         // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => $remark
-        ]);
+        $this->logActivityService->log($remark);
 
         $users = $query->paginate(10);
         
@@ -67,10 +68,9 @@ class UserController extends Controller
             'created_by' => Auth::id(),
         ]);
 
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::CREATE->generateRemark('User', $user->username)
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::CREATE, 'User', $user->username)
+        );
 
         return response()->json([
             'message' => 'User created successfully',
@@ -89,10 +89,9 @@ class UserController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::READ->generateRemark('User', $user->username)
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::READ, 'User', $user->username)
+        );
 
         return response()->json([
             'message' => 'User details',
@@ -134,10 +133,9 @@ class UserController extends Controller
 
         $user->update($data);
 
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::UPDATE->generateRemark('User', $user->username)
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::UPDATE, 'User', $user->username)
+        );
 
         return response()->json([
             'message' => 'User updated successfully',
@@ -159,10 +157,9 @@ class UserController extends Controller
         $user->update(['deleted_by' => Auth::id()]);
         $user->delete();
 
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::DELETE->generateRemark('User', $user->username)
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::DELETE, 'User', $user->username)
+        );
 
         return response()->json(['message' => 'User deleted successfully']);
     }

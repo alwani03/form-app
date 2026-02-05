@@ -3,33 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Menu;
-use App\Models\LogActivity;
 use App\Enums\ActivityType;
+use App\Services\LogActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class MenuController extends Controller
 {
+    public function __construct(
+        protected LogActivityService $logActivityService
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         $query = Menu::query();
-        $remark = ActivityType::LIST->generateRemark('Menus');
+        $remark = $this->logActivityService->generateRemark(ActivityType::LIST, 'Menus');
 
         if ($request->has('search')) {
             $query->where('name', 'like', '%' . $request->search . '%')
                   ->orWhere('url', 'like', '%' . $request->search . '%');
-            $remark = ActivityType::SEARCH->generateRemark('Menu', $request->search);
+            $remark = $this->logActivityService->generateRemark(ActivityType::SEARCH, 'Menu', $request->search);
         }
 
         // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => $remark,
-        ]);
+        $this->logActivityService->log($remark);
 
         $menus = $query->paginate(10);
 
@@ -60,10 +61,9 @@ class MenuController extends Controller
         ]);
 
         // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::CREATE->generateRemark('Menu', $menu->name),
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::CREATE, 'Menu', $menu->name)
+        );
 
         return response()->json([
             'message' => 'Menu created successfully',
@@ -83,10 +83,9 @@ class MenuController extends Controller
         }
 
         // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::READ->generateRemark('Menu', $menu->name),
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::READ, 'Menu', $menu->name)
+        );
 
         return response()->json([
             'message' => 'Menu details',
@@ -121,10 +120,9 @@ class MenuController extends Controller
         ]);
 
         // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::UPDATE->generateRemark('Menu', $menu->name),
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::UPDATE, 'Menu', $menu->name)
+        );
 
         return response()->json([
             'message' => 'Menu updated successfully',
@@ -150,10 +148,9 @@ class MenuController extends Controller
         $menu->delete();
 
         // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::DELETE->generateRemark('Menu', $menuName),
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::DELETE, 'Menu', $menuName)
+        );
 
         return response()->json([
             'message' => 'Menu deleted successfully'
