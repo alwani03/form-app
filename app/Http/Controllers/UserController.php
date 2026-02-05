@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Services\UserService;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -28,18 +29,9 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $validated = $request->validate([
-            'username' => 'required|string|max:255|unique:users',
-            'password' => 'required|string|min:6',
-            'email' => 'required|string|email|max:255|unique:users',
-            'role_id' => 'required|exists:roles,id',
-            'department_id' => 'required|exists:departments,id',
-            'is_active' => 'boolean'
-        ]);
-
-        $user = $this->userService->create($validated);
+        $user = $this->userService->create($request->validated());
 
         return response()->json([
             'message' => 'User created successfully',
@@ -67,17 +59,9 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(UpdateUserRequest $request, $id)
     {
-        $request->validate([
-            'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($id)],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($id)],
-            'role_id' => 'required|exists:roles,id',
-            'department_id' => 'required|exists:departments,id',
-            'is_active' => 'boolean'
-        ]);
-
-        $user = $this->userService->update($id, $request->all());
+        $user = $this->userService->update($id, $request->validated());
 
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
