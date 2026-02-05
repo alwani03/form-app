@@ -8,10 +8,12 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\RoleMenuController;
+use App\Http\Controllers\FormRequestController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
@@ -31,4 +33,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Role Menu Routes
     Route::apiResource('role-menus', RoleMenuController::class);
+
+    // Form Request Routes
+    Route::apiResource('form-requests', FormRequestController::class);
 });
