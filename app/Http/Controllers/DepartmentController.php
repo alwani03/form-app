@@ -2,34 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Department;
-use App\Models\LogActivity;
 use App\Enums\ActivityType;
+use App\Services\LogActivityService;
+use App\Services\DepartmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DepartmentController extends Controller
 {
+    public function __construct(
+        protected LogActivityService $logActivityService,
+        protected DepartmentService $departmentService
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Department::query();
-        $remark = ActivityType::LIST->generateRemark('Departments');
-
-        if ($request->has('search')) {
-            $query->where('department_name', 'like', '%' . $request->search . '%');
-            $remark = ActivityType::SEARCH->generateRemark('Department', $request->search);
-        }
-
-        // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => $remark,
-        ]);
-
-        $departments = $query->paginate(10);
+        $departments = $this->departmentService->paginate($request->search ?? null, 10);
 
         return response()->json([
             'message' => 'Departments retrieved successfully',
@@ -46,16 +37,7 @@ class DepartmentController extends Controller
             'department_name' => 'required|string|max:255|unique:departments,department_name',
         ]);
 
-        $department = Department::create([
-            'department_name' => $request->department_name,
-            'created_by' => Auth::id(),
-        ]);
-
-        // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::CREATE->generateRemark('Department', $department->department_name),
-        ]);
+        $department = $this->departmentService->create($request->department_name);
 
         return response()->json([
             'message' => 'Department created successfully',
@@ -68,17 +50,11 @@ class DepartmentController extends Controller
      */
     public function show($id)
     {
-        $department = Department::find($id);
+        $department = $this->departmentService->find($id);
 
         if (!$department) {
             return response()->json(['message' => 'Department not found'], 404);
         }
-
-        // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::READ->generateRemark('Department', $department->department_name),
-        ]);
 
         return response()->json([
             'message' => 'Department details',
@@ -91,26 +67,17 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $department = Department::find($id);
-
-        if (!$department) {
-            return response()->json(['message' => 'Department not found'], 404);
-        }
-
         $request->validate([
             'department_name' => 'required|string|max:255|unique:departments,department_name,' . $id,
         ]);
 
-        $department->update([
-            'department_name' => $request->department_name,
-            'updated_by' => Auth::id(),
+        $department = $this->departmentService->update($id, [
+            'department_name' => $request->department_name
         ]);
 
-        // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::UPDATE->generateRemark('Department', $department->department_name),
-        ]);
+        if (!$department) {
+            return response()->json(['message' => 'Department not found'], 404);
+        }
 
         return response()->json([
             'message' => 'Department updated successfully',
@@ -123,23 +90,11 @@ class DepartmentController extends Controller
      */
     public function destroy($id)
     {
-        $department = Department::find($id);
+        $deleted = $this->departmentService->delete($id);
 
-        if (!$department) {
+        if (!$deleted) {
             return response()->json(['message' => 'Department not found'], 404);
         }
-
-        $department_name = $department->department_name;
-        
-        // Update deleted_by before deleting
-        $department->update(['deleted_by' => Auth::id()]);
-        $department->delete();
-
-        // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::DELETE->generateRemark('Department', $department_name),
-        ]);
 
         return response()->json([
             'message' => 'Department deleted successfully'

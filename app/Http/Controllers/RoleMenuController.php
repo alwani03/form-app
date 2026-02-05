@@ -3,21 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\RoleMenu;
-use App\Models\LogActivity;
 use App\Enums\ActivityType;
+use App\Services\LogActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class RoleMenuController extends Controller
 {
+    public function __construct(
+        protected LogActivityService $logActivityService
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         $query = RoleMenu::query()->with(['role', 'menu']);
-        $remark = ActivityType::LIST->generateRemark('Role Menus');
+        $remark = $this->logActivityService->generateRemark(ActivityType::LIST, 'Role Menus');
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -26,7 +30,7 @@ class RoleMenuController extends Controller
             })->orWhereHas('menu', function ($q) use ($search) {
                 $q->where('name', 'like', '%' . $search . '%');
             });
-            $remark = ActivityType::SEARCH->generateRemark('Role Menu', $search);
+            $remark = $this->logActivityService->generateRemark(ActivityType::SEARCH, 'Role Menu', $search);
         }
 
         if ($request->has('role_id')) {
@@ -34,10 +38,7 @@ class RoleMenuController extends Controller
         }
 
         // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => $remark,
-        ]);
+        $this->logActivityService->log($remark);
 
         $roleMenus = $query->paginate(10);
 
@@ -79,10 +80,9 @@ class RoleMenuController extends Controller
         $roleMenu->load(['role', 'menu']);
         $details = "Role: {$roleMenu->role->role}, Menu: {$roleMenu->menu->name}";
         
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::CREATE->generateRemark('Role Menu', $details),
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::CREATE, 'Role Menu', $details)
+        );
 
         return response()->json([
             'message' => 'Role Menu created successfully',
@@ -103,10 +103,9 @@ class RoleMenuController extends Controller
 
         // Log Activity
         $details = "Role: {$roleMenu->role->role}, Menu: {$roleMenu->menu->name}";
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::READ->generateRemark('Role Menu', $details),
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::READ, 'Role Menu', $details)
+        );
 
         return response()->json([
             'message' => 'Role Menu details',
@@ -154,10 +153,9 @@ class RoleMenuController extends Controller
         $roleMenu->load(['role', 'menu']);
         $details = "Role: {$roleMenu->role->role}, Menu: {$roleMenu->menu->name}";
         
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::UPDATE->generateRemark('Role Menu', $details),
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::UPDATE, 'Role Menu', $details)
+        );
 
         return response()->json([
             'message' => 'Role Menu updated successfully',
@@ -183,10 +181,9 @@ class RoleMenuController extends Controller
         $roleMenu->delete();
 
         // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::DELETE->generateRemark('Role Menu', $details),
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::DELETE, 'Role Menu', $details)
+        );
 
         return response()->json([
             'message' => 'Role Menu deleted successfully'

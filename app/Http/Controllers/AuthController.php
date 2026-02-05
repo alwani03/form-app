@@ -5,12 +5,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
-use App\Models\LogActivity;
 use App\Enums\ActivityType;
+use App\Services\LogActivityService;
 use Illuminate\Support\Facades\Cookie;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        protected LogActivityService $logActivityService
+    ) {}
+
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -22,10 +26,10 @@ class AuthController extends Controller
             $user = Auth::user();
            
             // Log Activity
-            LogActivity::create([
-                'user_id' => $user->id,
-                'remark' => ActivityType::LOGIN->generateRemark('User', $user->username),
-            ]);
+             $this->logActivityService->log(
+                 $this->logActivityService->generateRemark(ActivityType::LOGIN, 'User', $user->username),
+                 $user->id
+             );
 
             $token = $user->createToken('auth_token')->plainTextToken;
             // Generate dummy cookie values as per image example (long hashes)
@@ -52,11 +56,11 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         // Log Activity before deleting token
-        if ($user = $request->user()) {
-            LogActivity::create([
-                'user_id' => $user->id,
-                'remark' => ActivityType::LOGOUT->generateRemark('User', $user->username),
-            ]);
+         if ($user = $request->user()) {
+             $this->logActivityService->log(
+                 $this->logActivityService->generateRemark(ActivityType::LOGOUT, 'User', $user->username),
+                 $user->id
+             );
 
             $user->currentAccessToken()->delete();
         }

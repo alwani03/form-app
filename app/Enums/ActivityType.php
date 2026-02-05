@@ -12,15 +12,4 @@ enum ActivityType: string
     case DELETE      = 'Delete';
     case LOGIN       = 'Login';
     case LOGOUT      = 'Logout';
-
-    public function generateRemark(string $module, ?string $details = null): string
-    {
-        $remark = "{$this->value} {$module}";
-        
-        if ($details) {
-            $remark .= ": {$details}";
-        }
-
-        return $remark;
-    }
 }

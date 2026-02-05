@@ -3,32 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Models\Role;
-use App\Models\LogActivity;
 use App\Enums\ActivityType;
+use App\Services\LogActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class RoleController extends Controller
 {
+    public function __construct(
+        protected LogActivityService $logActivityService
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         $query = Role::query();
-        $remark = ActivityType::LIST->generateRemark('Roles');
+        $remark = $this->logActivityService->generateRemark(ActivityType::LIST, 'Roles');
 
         if ($request->has('search')) {
             $query->where('role', 'like', '%' . $request->search . '%')
                   ->orWhere('description', 'like', '%' . $request->search . '%');
-            $remark = ActivityType::SEARCH->generateRemark('Role', $request->search);
+            $remark = $this->logActivityService->generateRemark(ActivityType::SEARCH, 'Role', $request->search);
         }
 
         // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => $remark,
-        ]);
+        $this->logActivityService->log($remark);
 
         $roles = $query->paginate(10);
 
@@ -57,10 +58,9 @@ class RoleController extends Controller
         ]);
 
         // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::CREATE->generateRemark('Role', $role->role),
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::CREATE, 'Role', $role->role)
+        );
 
         return response()->json([
             'message' => 'Role created successfully',
@@ -80,10 +80,9 @@ class RoleController extends Controller
         }
 
         // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::READ->generateRemark('Role', $role->role),
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::READ, 'Role', $role->role)
+        );
 
         return response()->json([
             'message' => 'Role details',
@@ -116,10 +115,9 @@ class RoleController extends Controller
         ]);
 
         // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::UPDATE->generateRemark('Role', $role->role),
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::UPDATE, 'Role', $role->role)
+        );
 
         return response()->json([
             'message' => 'Role updated successfully',
@@ -145,10 +143,9 @@ class RoleController extends Controller
         $role->delete();
 
         // Log Activity
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'remark' => ActivityType::DELETE->generateRemark('Role', $role_name),
-        ]);
+        $this->logActivityService->log(
+            $this->logActivityService->generateRemark(ActivityType::DELETE, 'Role', $role_name)
+        );
 
         return response()->json([
             'message' => 'Role deleted successfully'
