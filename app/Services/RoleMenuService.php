@@ -38,18 +38,38 @@ class RoleMenuService
 
     public function create(array $data): RoleMenu
     {
-        $roleMenu = RoleMenu::create([
-            'role_id' => $data['role_id'],
-            'menu_id' => $data['menu_id'],
-            'is_active' => $data['is_active'] ?? 1,
-            'created_by' => Auth::id(),
-        ]);
+        $roleMenu = RoleMenu::withTrashed()
+            ->where('role_id', $data['role_id'])
+            ->where('menu_id', $data['menu_id'])
+            ->first();
+
+        if ($roleMenu) {
+            if ($roleMenu->trashed()) {
+                $roleMenu->restore();
+            }
+
+            $roleMenu->update([
+                'is_active'   => $data['is_active'] ?? 1,
+                'updated_by'  => Auth::id(),
+            ]);
+
+            $activityType = ActivityType::UPDATE;
+        } else {
+            $roleMenu = RoleMenu::create([
+                'role_id'     => $data['role_id'],
+                'menu_id'     => $data['menu_id'],
+                'is_active'   => $data['is_active'] ?? 1,
+                'created_by'  => Auth::id(),
+            ]);
+
+            $activityType = ActivityType::CREATE;
+        }
 
         $roleMenu->load(['role', 'menu']);
         $details = "Role: {$roleMenu->role->role}, Menu: {$roleMenu->menu->name}";
         
         $this->logActivityService->log(
-            $this->logActivityService->generateRemark(ActivityType::CREATE, 'Role Menu', $details)
+            $this->logActivityService->generateRemark($activityType, 'Role Menu', $details)
         );
 
         return $roleMenu;

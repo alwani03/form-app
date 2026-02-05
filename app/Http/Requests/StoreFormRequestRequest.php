@@ -13,6 +13,7 @@ class StoreFormRequestRequest extends FormRequest
 
     public function rules(): array
     {
+        // die('kena');
         return [
             'form_no'           => 'required|string|max:255|unique:form_requests,form_no',
             'form_name'         => 'required|string|max:255',

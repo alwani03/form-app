@@ -35,13 +35,13 @@ class UserService
     public function create(array $data): User
     {
         $user = User::create([
-            'username' => $data['username'],
-            'password' => Hash::make($data['password']),
-            'email' => $data['email'],
-            'role_id' => $data['role_id'],
-            'department_id' => $data['department_id'],
-            'is_active' => $data['is_active'] ?? true,
-            'created_by' => Auth::id(),
+            'username'        => $data['username'],
+            'password'        => Hash::make($data['password']),
+            'email'           => $data['email'],
+            'role_id'         => $data['role_id'],
+            'department_id'   => $data['department_id'],
+            'is_active'       => $data['is_active'] ?? true,
+            'created_by'      => Auth::id(),
         ]);
 
         $this->logActivityService->log(
@@ -53,7 +53,7 @@ class UserService
 
     public function find(int $id): ?User
     {
-        $user = User::with(['role', 'department'])->find($id);
+        $user = User::with(['role', 'department','role_menus','menu.masterMenu'])->find($id);
 
         if ($user) {
             $this->logActivityService->log(

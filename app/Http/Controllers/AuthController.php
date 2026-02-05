@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Http\Resources\UserResource;
 use App\Enums\ActivityType;
 use App\Services\LogActivityService;
 use Illuminate\Support\Facades\Cookie;
@@ -43,9 +44,12 @@ class AuthController extends Controller
             $cookie1 = cookie('HWE_PUSS', $hwePuss, 60 * 24 * 365, '/', null, true, true);
             $cookie2 = cookie('HWE_USS', $hweUss, 60 * 24 * 365, '/', null, true, true);
 
+            // Load relationships for Resource
+            $user->load(['role', 'department', 'menu.masterMenu']);
+
             return response()->json([
                 'message' => 'Login success',
-                'user' => $user,
+                'user' => new UserResource($user),
                 'token' => $token
             ])->withCookie($cookie1)->withCookie($cookie2);
         }

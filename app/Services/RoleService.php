@@ -32,10 +32,10 @@ class RoleService
     public function create(array $data): Role
     {
         $role = Role::create([
-            'role' => $data['role'],
-            'description' => $data['description'] ?? null,
-            'is_active' => $data['is_active'] ?? 1,
-            'created_by' => Auth::id(),
+            'role'            => $data['role'],
+            'description'     => $data['description'] ?? null,
+            'is_active'       => $data['is_active'] ?? 1,
+            'created_by'      => Auth::id(),
         ]);
 
         $this->logActivityService->log(
