@@ -54,4 +54,18 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Department::class);
     }
+
+    public function role_menus()
+    {
+        return $this->hasMany(RoleMenu::class, 'role_id', 'role_id');
+    }
+
+    public function menu()
+    {
+        return $this->belongsToMany(Menu::class, 'role_menus', 'role_id', 'menu_id', 'role_id', 'id')
+            ->whereNull('role_menus.deleted_at')
+            ->where('role_menus.is_active', 1)
+            ->whereNull('menus.deleted_at')
+            ->where('menus.is_active', 1);
+    }
 }

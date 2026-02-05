@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreRoleMenuRequest extends FormRequest
+class StoreMasterMenuRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -15,14 +15,10 @@ class StoreRoleMenuRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'role_id' => 'required|exists:roles,id',
-            'menu_id' => 'required|exists:menus,id',
+            'name' => ['required', 'string', 'max:255', 'unique:master_menus,name'],
+            'icon' => ['nullable', 'string', 'max:255'],
+            'ordering' => ['nullable', 'integer'],
             'is_active' => 'boolean',
         ];
-    }
-
-    public function messages(): array
-    {
-        return [];
     }
 }

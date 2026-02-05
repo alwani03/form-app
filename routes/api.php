@@ -10,6 +10,7 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\RoleMenuController;
 use App\Http\Controllers\FormRequestController;
 use App\Http\Controllers\DocumentTypeConfigController;
+use App\Http\Controllers\MasterMenuController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -39,4 +40,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Document Type Config Routes
     Route::apiResource('document-type-configs', DocumentTypeConfigController::class);
+    
+    // Master Menu Routes
+    Route::apiResource('master-menus', MasterMenuController::class);
 });

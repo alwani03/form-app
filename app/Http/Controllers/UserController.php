@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\UserService;
+use App\Http\Resources\UserResource;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+public function index(Request $request)
     {
         $users = $this->userService->paginate($request->search ?? null, 10);
         
@@ -52,7 +53,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'User details',
-            'data' => $user
+            'data' => new UserResource($user)
         ]);
     }
 
