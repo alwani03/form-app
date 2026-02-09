@@ -21,7 +21,8 @@ class RoleMenuController extends Controller
         $roleMenus = $this->roleMenuService->paginate(
             $request->search ?? null,
             $request->role_id ?? null,
-            10
+            10,
+            $request->header('X-Skip-Log')
         );
 
         return response()->json([
@@ -46,9 +47,9 @@ class RoleMenuController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
-        $roleMenu = $this->roleMenuService->find($id);
+        $roleMenu = $this->roleMenuService->find($id, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
 
         if (!$roleMenu) {
             return response()->json(['message' => 'Role Menu not found'], 404);

@@ -18,7 +18,7 @@ class RoleController extends Controller
      */
     public function index(Request $request)
     {
-        $roles = $this->roleService->paginate($request->search ?? null, 10);
+        $roles = $this->roleService->paginate($request->search ?? null, 10, $request->header('X-Skip-Log'));
 
         return response()->json([
             'message' => 'Roles retrieved successfully',
@@ -42,9 +42,9 @@ class RoleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $role = $this->roleService->find($id);
+        $role = $this->roleService->find($id, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
 
         if (!$role) {
             return response()->json(['message' => 'Role not found'], 404);

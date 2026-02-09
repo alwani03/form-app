@@ -14,7 +14,7 @@ class UserService
         protected LogActivityService $logActivityService
     ) {}
 
-    public function paginate(?string $search = null, int $perPage = 10): LengthAwarePaginator
+    public function paginate(?string $search = null, int $perPage = 10, bool $skipLog = false): LengthAwarePaginator
     {
         $query = User::with(['role', 'department']);
         $remark = $this->logActivityService->generateRemark(ActivityType::LIST, 'Users');
@@ -27,7 +27,9 @@ class UserService
             $remark = $this->logActivityService->generateRemark(ActivityType::SEARCH, 'User', "Keyword: {$search}");
         }
 
-        $this->logActivityService->log($remark);
+        if (!$skipLog) {
+            $this->logActivityService->log($remark);
+        }
 
         return $query->paginate($perPage);
     }
@@ -51,11 +53,11 @@ class UserService
         return $user;
     }
 
-    public function find(int $id): ?User
+    public function find(int $id, bool $skipLog = false): ?User
     {
         $user = User::with(['role', 'department','role_menus','menu.masterMenu'])->find($id);
 
-        if ($user) {
+        if ($user && !$skipLog) {
             $this->logActivityService->log(
                 $this->logActivityService->generateRemark(ActivityType::READ, 'User', $user->username)
             );

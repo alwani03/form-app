@@ -22,8 +22,8 @@ class DepartmentController extends Controller
      */
     public function index(Request $request)
     {
-        $departments = $this->departmentService->paginate($request->search ?? null, 10);
-
+        $departments = $this->departmentService->paginate($request->search ?? null, 10, $request->header('X-Skip-Log'));
+    
         return response()->json([
             'message' => 'Departments retrieved successfully',
             'data' => $departments
@@ -46,9 +46,9 @@ class DepartmentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $department = $this->departmentService->find($id);
+        $department = $this->departmentService->find($id, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
 
         if (!$department) {
             return response()->json(['message' => 'Department not found'], 404);

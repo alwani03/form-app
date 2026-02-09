@@ -12,7 +12,7 @@ class DepartmentService
         protected LogActivityService $logActivityService
     ) {}
 
-    public function paginate(?string $search = null, int $perPage = 10)
+    public function paginate(?string $search = null, int $perPage = 10, bool $skipLog = false)
     {
         $query = Department::query();
         $remark = $this->logActivityService->generateRemark(ActivityType::LIST, 'Departments');
@@ -22,8 +22,11 @@ class DepartmentService
             $remark = $this->logActivityService->generateRemark(ActivityType::SEARCH, 'Department', $search);
         }
 
-        $this->logActivityService->log($remark);
-        return $query->paginate($perPage);
+        if (!$skipLog) {
+            $this->logActivityService->log($remark);
+        }
+        
+        return $query->paginate($perPage,$skipLog);
     }
 
     public function create(string $departmentName): Department
@@ -40,18 +43,19 @@ class DepartmentService
         return $department;
     }
 
-    public function find(int $id): ?Department
+    public function find(int $id, bool $skipLog = false): ?Department
     {
         $department = Department::find($id);
-        if ($department) {
+        if ($department && !$skipLog) {
             $this->logActivityService->log(
                 $this->logActivityService->generateRemark(ActivityType::READ, 'Department', $department->department_name)
             );
         }
+
         return $department;
     }
 
-    public function update(int $id, array $data): ?Department
+    public function update(int $id, string $departmentName): ?Department
     {
         $department = Department::find($id);
         if (!$department) {
@@ -59,8 +63,7 @@ class DepartmentService
         }
 
         $department->update([
-            'department_name' => $data['department_name'],
-            'updated_by' => Auth::id(),
+            'department_name' => $departmentName,
         ]);
 
         $this->logActivityService->log(
@@ -78,7 +81,6 @@ class DepartmentService
         }
 
         $name = $department->department_name;
-        $department->update(['deleted_by' => Auth::id()]);
         $department->delete();
 
         $this->logActivityService->log(

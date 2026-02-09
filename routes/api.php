@@ -11,6 +11,7 @@ use App\Http\Controllers\RoleMenuController;
 use App\Http\Controllers\FormRequestController;
 use App\Http\Controllers\DocumentTypeConfigController;
 use App\Http\Controllers\MasterMenuController;
+use App\Http\Controllers\IncidentFormDetailController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -43,4 +44,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
     // Master Menu Routes
     Route::apiResource('master-menus', MasterMenuController::class);
+
+    // Incident Form Detail Routes
+    Route::put('incident-form-details/{id}/process', [IncidentFormDetailController::class, 'process']);
+    Route::put('incident-form-details/{id}/complete', [IncidentFormDetailController::class, 'complete']);
+    Route::apiResource('incident-form-details', IncidentFormDetailController::class);
 });

@@ -15,7 +15,7 @@ class FormRequestController extends Controller
 
     public function index(Request $request)
     {
-        $formRequests = $this->formRequestService->paginate($request->search ?? null, 10);
+        $formRequests = $this->formRequestService->paginate($request->search ?? null, 10, $request->header('X-Skip-Log'));
 
         return response()->json([
             'message' => 'Form Requests retrieved successfully',
@@ -33,9 +33,9 @@ class FormRequestController extends Controller
         ], 201);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $formRequest = $this->formRequestService->find($id);
+        $formRequest = $this->formRequestService->find($id, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
 
         if (!$formRequest) {
             return response()->json(['message' => 'Form Request not found'], 404);

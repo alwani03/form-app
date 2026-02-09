@@ -13,7 +13,7 @@ class DocumentTypeConfigService
         protected LogActivityService $logActivityService
     ) {}
 
-    public function paginate(?string $search = null, int $perPage = 10): LengthAwarePaginator
+    public function paginate(?string $search = null, int $perPage = 10, bool $skipLog = false): LengthAwarePaginator
     {
         $query = DocumentTypeConfig::query();
         $remark = $this->logActivityService->generateRemark(ActivityType::LIST, 'Document Type Configs');
@@ -24,7 +24,9 @@ class DocumentTypeConfigService
             $remark = $this->logActivityService->generateRemark(ActivityType::SEARCH, 'Document Type Config', $search);
         }
 
-        $this->logActivityService->log($remark);
+        if (!$skipLog) {
+            $this->logActivityService->log($remark);
+        }
 
         return $query->paginate($perPage);
     }
@@ -47,11 +49,11 @@ class DocumentTypeConfigService
         return $config;
     }
 
-    public function find(int $id): ?DocumentTypeConfig
+    public function find(int $id, bool $skipLog = false): ?DocumentTypeConfig
     {
         $config = DocumentTypeConfig::find($id);
 
-        if ($config) {
+        if ($config && !$skipLog) {
             $this->logActivityService->log(
                 $this->logActivityService->generateRemark(ActivityType::READ, 'Document Type Config', $config->type)
             );

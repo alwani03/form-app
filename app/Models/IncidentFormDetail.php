@@ -20,4 +20,9 @@ class IncidentFormDetail extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function formRequest()
+    {
+        return $this->belongsTo(FormRequest::class, 'form_id');
+    }
 }

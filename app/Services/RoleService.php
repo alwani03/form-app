@@ -13,7 +13,7 @@ class RoleService
         protected LogActivityService $logActivityService
     ) {}
 
-    public function paginate(?string $search = null, int $perPage = 10): LengthAwarePaginator
+    public function paginate(?string $search = null, int $perPage = 10, bool $skipLog = false): LengthAwarePaginator
     {
         $query = Role::query();
         $remark = $this->logActivityService->generateRemark(ActivityType::LIST, 'Roles');
@@ -24,7 +24,9 @@ class RoleService
             $remark = $this->logActivityService->generateRemark(ActivityType::SEARCH, 'Role', $search);
         }
 
-        $this->logActivityService->log($remark);
+        if (!$skipLog) {
+            $this->logActivityService->log($remark);
+        }
 
         return $query->paginate($perPage);
     }
@@ -45,11 +47,11 @@ class RoleService
         return $role;
     }
 
-    public function find(int $id): ?Role
+    public function find(int $id, bool $skipLog = false): ?Role
     {
         $role = Role::find($id);
 
-        if ($role) {
+        if ($role && !$skipLog) {
             $this->logActivityService->log(
                 $this->logActivityService->generateRemark(ActivityType::READ, 'Role', $role->role)
             );

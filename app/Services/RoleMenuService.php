@@ -13,7 +13,7 @@ class RoleMenuService
         protected LogActivityService $logActivityService
     ) {}
 
-    public function paginate(?string $search = null, ?int $roleId = null, int $perPage = 10): LengthAwarePaginator
+    public function paginate(?string $search = null, ?int $roleId = null, int $perPage = 10, bool $skipLog = false): LengthAwarePaginator
     {
         $query = RoleMenu::query()->with(['role', 'menu']);
         $remark = $this->logActivityService->generateRemark(ActivityType::LIST, 'Role Menus');
@@ -31,7 +31,9 @@ class RoleMenuService
             $query->where('role_id', $roleId);
         }
 
-        $this->logActivityService->log($remark);
+        if (!$skipLog) {
+            $this->logActivityService->log($remark);
+        }
 
         return $query->paginate($perPage);
     }
@@ -75,11 +77,11 @@ class RoleMenuService
         return $roleMenu;
     }
 
-    public function find(int $id): ?RoleMenu
+    public function find(int $id, bool $skipLog = false): ?RoleMenu
     {
         $roleMenu = RoleMenu::with(['role', 'menu'])->find($id);
 
-        if ($roleMenu) {
+        if ($roleMenu && !$skipLog) {
             $details = "Role: {$roleMenu->role->role}, Menu: {$roleMenu->menu->name}";
             $this->logActivityService->log(
                 $this->logActivityService->generateRemark(ActivityType::READ, 'Role Menu', $details)
