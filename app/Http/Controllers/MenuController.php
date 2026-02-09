@@ -18,7 +18,7 @@ class MenuController extends Controller
      */
     public function index(Request $request)
     {
-        $menus = $this->menuService->paginate($request->search ?? null, 10);
+        $menus = $this->menuService->paginate($request->search ?? null, 10, $request->header('X-Skip-Log'));
 
         return response()->json([
             'message' => 'Menus retrieved successfully',
@@ -42,9 +42,9 @@ class MenuController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $menu = $this->menuService->find($id);
+        $menu = $this->menuService->find($id, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
 
         if (!$menu) {
             return response()->json(['message' => 'Menu not found'], 404);

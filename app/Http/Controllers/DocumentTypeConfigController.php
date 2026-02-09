@@ -15,7 +15,7 @@ class DocumentTypeConfigController extends Controller
 
     public function index(Request $request)
     {
-        $configs = $this->service->paginate($request->search ?? null, 10);
+        $configs = $this->service->paginate($request->search ?? null, 10, $request->header('X-Skip-Log'));
 
         return response()->json([
             'message' => 'Document Type Configs retrieved successfully',
@@ -33,9 +33,9 @@ class DocumentTypeConfigController extends Controller
         ], 201);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $config = $this->service->find($id);
+        $config = $this->service->find($id, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
 
         if (!$config) {
             return response()->json(['message' => 'Document Type Config not found'], 404);

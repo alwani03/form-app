@@ -19,7 +19,7 @@ class UserController extends Controller
      */
 public function index(Request $request)
     {
-        $users = $this->userService->paginate($request->search ?? null, 10);
+        $users = $this->userService->paginate($request->search ?? null, 10, $request->header('X-Skip-Log'));
         
         return response()->json([
             'message' => 'Users retrieved successfully',
@@ -43,9 +43,9 @@ public function index(Request $request)
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
-        $user = $this->userService->find($id);
+        $user = $this->userService->find($id, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
 
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);

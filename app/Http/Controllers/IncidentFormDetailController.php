@@ -19,7 +19,7 @@ class IncidentFormDetailController extends Controller
 
     public function index(Request $request)
     {
-        $incidents = $this->incidentService->index($request->all());
+        $incidents = $this->incidentService->index($request->all(), $request->header('X-Skip-Log', false));
         return IncidentFormDetailResource::collection($incidents);
     }
 
@@ -29,9 +29,9 @@ class IncidentFormDetailController extends Controller
         return new IncidentFormDetailResource($incident);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $incident = $this->incidentService->find($id);
+        $incident = $this->incidentService->find($id, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
         return new IncidentFormDetailResource($incident);
     }
 
@@ -45,5 +45,23 @@ class IncidentFormDetailController extends Controller
     {
         $this->incidentService->delete($id);
         return response()->json(['message' => 'Incident deleted successfully']);
+    }
+
+    public function process($id)
+    {
+        $incident = $this->incidentService->process($id);
+        return new IncidentFormDetailResource($incident);
+    }
+
+    public function complete(Request $request, $id)
+    {
+        $request->validate([
+            'incident_resolution' => 'required|string',
+            'incident_root_cause' => 'nullable|string',
+            'action_plan' => 'nullable|string',
+        ]);
+
+        $incident = $this->incidentService->complete($id, $request->all());
+        return new IncidentFormDetailResource($incident);
     }
 }

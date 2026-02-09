@@ -13,7 +13,7 @@ class FormRequestService
         protected LogActivityService $logActivityService
     ) {}
 
-    public function paginate(?string $search = null, int $perPage = 10): LengthAwarePaginator
+    public function paginate(?string $search = null, int $perPage = 10, bool $skipLog = false): LengthAwarePaginator
     {
         $query = FormRequestModel::query()->with(['documentType', 'user']);
         $remark = $this->logActivityService->generateRemark(ActivityType::LIST, 'Form Requests');
@@ -24,7 +24,9 @@ class FormRequestService
             $remark = $this->logActivityService->generateRemark(ActivityType::SEARCH, 'Form Request', $search);
         }
 
-        $this->logActivityService->log($remark);
+        if (!$skipLog) {
+            $this->logActivityService->log($remark);
+        }
 
         return $query->paginate($perPage);
     }
@@ -47,11 +49,11 @@ class FormRequestService
         return $formRequest;
     }
 
-    public function find(int $id): ?FormRequestModel
+    public function find(int $id, bool $skipLog = false): ?FormRequestModel
     {
         $formRequest = FormRequestModel::with(['documentType', 'user', 'logs'])->find($id);
 
-        if ($formRequest) {
+        if ($formRequest && !$skipLog) {
             $this->logActivityService->log(
                 $this->logActivityService->generateRemark(ActivityType::READ, 'Form Request', $formRequest->form_no)
             );

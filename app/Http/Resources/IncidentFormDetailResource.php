@@ -19,6 +19,7 @@ class IncidentFormDetailResource extends JsonResource
             'user_id'                               => $this->user_id,
             'user'                                  => $this->user, // Assuming relationship exists
             'form_id'                               => $this->form_id,
+            'form_request'                          => $this->formRequest, // Added relationship
             'report_no'                             => $this->report_no,
             'destination_group'                     => $this->destination_group,
             'incident_date'                         => $this->incident_date,

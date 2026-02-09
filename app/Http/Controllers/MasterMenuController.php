@@ -15,7 +15,7 @@ class MasterMenuController extends Controller
 
     public function index(Request $request)
     {
-        $masterMenus = $this->service->paginate($request->search ?? null, 10);
+        $masterMenus = $this->service->paginate($request->search ?? null, 10, $request->header('X-Skip-Log'));
 
         return response()->json([
             'message' => 'Master Menus retrieved successfully',
@@ -33,9 +33,9 @@ class MasterMenuController extends Controller
         ], 201);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $masterMenu = $this->service->find($id);
+        $masterMenu = $this->service->find($id, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
 
         if (!$masterMenu) {
             return response()->json(['message' => 'Master Menu not found'], 404);

@@ -133,6 +133,12 @@
                                 "key": "Authorization",
                                 "value": "Bearer {{token}}",
                                 "type": "text"
+                            },
+                            {
+                                "key": "X-Skip-Log",
+                                "value": "false",
+                                "type": "text",
+                                "description": "Set to true to skip activity logging"
                             }
                         ],
                         "url": {
@@ -318,6 +324,12 @@
                                 "key": "Authorization",
                                 "value": "Bearer {{token}}",
                                 "type": "text"
+                            },
+                            {
+                                "key": "X-Skip-Log",
+                                "value": "false",
+                                "type": "text",
+                                "description": "Set to true to skip activity logging"
                             }
                         ],
                         "url": {
@@ -503,6 +515,12 @@
                                 "key": "Authorization",
                                 "value": "Bearer {{token}}",
                                 "type": "text"
+                            },
+                            {
+                                "key": "X-Skip-Log",
+                                "value": "false",
+                                "type": "text",
+                                "description": "Set to true to skip activity logging"
                             }
                         ],
                         "url": {
@@ -686,6 +704,12 @@
                                 "key": "Authorization",
                                 "value": "Bearer {{token}}",
                                 "type": "text"
+                            },
+                            {
+                                "key": "X-Skip-Log",
+                                "value": "false",
+                                "type": "text",
+                                "description": "Set to true to skip activity logging"
                             }
                         ],
                         "url": {
@@ -869,6 +893,12 @@
                                 "key": "Authorization",
                                 "value": "Bearer {{token}}",
                                 "type": "text"
+                            },
+                            {
+                                "key": "X-Skip-Log",
+                                "value": "false",
+                                "type": "text",
+                                "description": "Set to true to skip activity logging"
                             }
                         ],
                         "url": {
@@ -1052,6 +1082,12 @@
                                 "key": "Authorization",
                                 "value": "Bearer {{token}}",
                                 "type": "text"
+                            },
+                            {
+                                "key": "X-Skip-Log",
+                                "value": "false",
+                                "type": "text",
+                                "description": "Set to true to skip activity logging"
                             }
                         ],
                         "url": {
@@ -1240,6 +1276,12 @@
                                 "key": "Authorization",
                                 "value": "Bearer {{token}}",
                                 "type": "text"
+                            },
+                            {
+                                "key": "X-Skip-Log",
+                                "value": "false",
+                                "type": "text",
+                                "description": "Set to true to skip activity logging"
                             }
                         ],
                         "url": {
@@ -1423,6 +1465,12 @@
                                 "key": "Authorization",
                                 "value": "Bearer {{token}}",
                                 "type": "text"
+                            },
+                            {
+                                "key": "X-Skip-Log",
+                                "value": "false",
+                                "type": "text",
+                                "description": "Set to true to skip activity logging"
                             }
                         ],
                         "url": {
@@ -1588,8 +1636,7 @@
                     "response": []
                 }
             ]
-        }
-    ,
+        },
         {
             "name": "Master Menus",
             "item": [
@@ -1607,6 +1654,12 @@
                                 "key": "Authorization",
                                 "value": "Bearer {{token}}",
                                 "type": "text"
+                            },
+                            {
+                                "key": "X-Skip-Log",
+                                "value": "false",
+                                "type": "text",
+                                "description": "Set to true to skip activity logging"
                             }
                         ],
                         "url": {
@@ -1792,6 +1845,12 @@
                                 "key": "Authorization",
                                 "value": "Bearer {{token}}",
                                 "type": "text"
+                            },
+                            {
+                                "key": "X-Skip-Log",
+                                "value": "false",
+                                "type": "text",
+                                "description": "Set to true to skip activity logging"
                             }
                         ],
                         "url": {
@@ -1939,6 +1998,77 @@
                                 "api",
                                 "incident-form-details",
                                 "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Process Incident",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/incident-form-details/1/process",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "incident-form-details",
+                                "1",
+                                "process"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Complete Incident",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"incident_resolution\": \"Resolved issue\",\n    \"incident_root_cause\": \"Hardware failure\",\n    \"action_plan\": \"Replaced part\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/incident-form-details/1/complete",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "incident-form-details",
+                                "1",
+                                "complete"
                             ]
                         }
                     },

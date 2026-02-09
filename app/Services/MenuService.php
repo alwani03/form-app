@@ -13,7 +13,7 @@ class MenuService
         protected LogActivityService $logActivityService
     ) {}
 
-    public function paginate(?string $search = null, int $perPage = 10): LengthAwarePaginator
+    public function paginate(?string $search = null, int $perPage = 10, bool $skipLog = false): LengthAwarePaginator
     {
         $query  = Menu::with('masterMenu');
         $remark = $this->logActivityService->generateRemark(ActivityType::LIST, 'Menus');
@@ -24,7 +24,9 @@ class MenuService
             $remark = $this->logActivityService->generateRemark(ActivityType::SEARCH, 'Menu', $search);
         }
 
-        $this->logActivityService->log($remark);
+        if (!$skipLog) {
+            $this->logActivityService->log($remark);
+        }
 
         return $query->paginate($perPage);
     }
@@ -51,11 +53,11 @@ class MenuService
         return $menu;
     }
 
-    public function find(int $id): ?Menu
+    public function find(int $id, bool $skipLog = false): ?Menu
     {
         $menu = Menu::with('masterMenu')->find($id);
 
-        if ($menu) {
+        if ($menu && !$skipLog) {
             $this->logActivityService->log(
                 $this->logActivityService->generateRemark(ActivityType::READ, 'Menu', $menu->name)
             );
