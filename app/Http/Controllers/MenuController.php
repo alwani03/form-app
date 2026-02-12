@@ -18,7 +18,7 @@ class MenuController extends Controller
      */
     public function index(Request $request)
     {
-        $menus = $this->menuService->paginate($request->search ?? null, 10, $request->header('X-Skip-Log'));
+        $menus = $this->menuService->paginate($request->search ?? null, 10, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
 
         return response()->json([
             'message' => 'Menus retrieved successfully',

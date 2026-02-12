@@ -15,7 +15,7 @@ class DocumentTypeConfigController extends Controller
 
     public function index(Request $request)
     {
-        $configs = $this->service->paginate($request->search ?? null, 10, $request->header('X-Skip-Log'));
+        $configs = $this->service->paginate($request->search ?? null, 10, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
 
         return response()->json([
             'message' => 'Document Type Configs retrieved successfully',

@@ -22,7 +22,7 @@ class RoleMenuController extends Controller
             $request->search ?? null,
             $request->role_id ?? null,
             10,
-            $request->header('X-Skip-Log')
+            filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN)
         );
 
         return response()->json([

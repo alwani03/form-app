@@ -22,8 +22,8 @@ class DepartmentController extends Controller
      */
     public function index(Request $request)
     {
-        $departments = $this->departmentService->paginate($request->search ?? null, 10, $request->header('X-Skip-Log'));
-    
+        $departments = $this->departmentService->paginate($request->search ?? null, 10, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
+
         return response()->json([
             'message' => 'Departments retrieved successfully',
             'data' => $departments

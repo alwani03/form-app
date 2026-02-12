@@ -15,7 +15,7 @@ class FormRequestController extends Controller
 
     public function index(Request $request)
     {
-        $formRequests = $this->formRequestService->paginate($request->search ?? null, 10, $request->header('X-Skip-Log'));
+        $formRequests = $this->formRequestService->paginate($request->search ?? null, 10, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
 
         return response()->json([
             'message' => 'Form Requests retrieved successfully',

@@ -19,7 +19,7 @@ class IncidentFormDetailController extends Controller
 
     public function index(Request $request)
     {
-        $incidents = $this->incidentService->index($request->all(), $request->header('X-Skip-Log', false));
+        $incidents = $this->incidentService->index($request->all(), filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
         return IncidentFormDetailResource::collection($incidents);
     }
 

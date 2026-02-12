@@ -19,11 +19,12 @@ class UserController extends Controller
      */
 public function index(Request $request)
     {
-        $users = $this->userService->paginate($request->search ?? null, 10, $request->header('X-Skip-Log'));
+        $users = $this->userService->paginate($request->search ?? null, 10, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
         
         return response()->json([
             'message' => 'Users retrieved successfully',
-            'data' => $users
+            'data' => $users,
+            'skip' => $request->header('X-Skip-Log')
         ]);
     }
 

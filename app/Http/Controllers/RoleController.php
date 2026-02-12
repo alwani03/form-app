@@ -18,7 +18,7 @@ class RoleController extends Controller
      */
     public function index(Request $request)
     {
-        $roles = $this->roleService->paginate($request->search ?? null, 10, $request->header('X-Skip-Log'));
+        $roles = $this->roleService->paginate($request->search ?? null, 10, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
 
         return response()->json([
             'message' => 'Roles retrieved successfully',

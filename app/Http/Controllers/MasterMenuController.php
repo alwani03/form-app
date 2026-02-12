@@ -15,7 +15,7 @@ class MasterMenuController extends Controller
 
     public function index(Request $request)
     {
-        $masterMenus = $this->service->paginate($request->search ?? null, 10, $request->header('X-Skip-Log'));
+        $masterMenus = $this->service->paginate($request->search ?? null, 10, filter_var($request->header('X-Skip-Log'), FILTER_VALIDATE_BOOLEAN));
 
         return response()->json([
             'message' => 'Master Menus retrieved successfully',

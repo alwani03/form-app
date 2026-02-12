@@ -26,7 +26,7 @@ class DepartmentService
             $this->logActivityService->log($remark);
         }
         
-        return $query->paginate($perPage,$skipLog);
+        return $query->paginate($perPage);
     }
 
     public function create(string $departmentName): Department
