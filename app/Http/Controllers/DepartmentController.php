@@ -65,9 +65,7 @@ class DepartmentController extends Controller
      */
     public function update(UpdateDepartmentRequest $request, $id)
     {
-        $department = $this->departmentService->update($id, [
-            'department_name' => $request->validated()['department_name']
-        ]);
+        $department = $this->departmentService->update($id, $request->validated()['department_name']);
 
         if (!$department) {
             return response()->json(['message' => 'Department not found'], 404);

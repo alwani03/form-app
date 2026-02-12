@@ -12,6 +12,7 @@ use App\Http\Controllers\FormRequestController;
 use App\Http\Controllers\DocumentTypeConfigController;
 use App\Http\Controllers\MasterMenuController;
 use App\Http\Controllers\IncidentFormDetailController;
+use App\Http\Controllers\LogActivityController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -49,4 +50,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('incident-form-details/{id}/process', [IncidentFormDetailController::class, 'process']);
     Route::put('incident-form-details/{id}/complete', [IncidentFormDetailController::class, 'complete']);
     Route::apiResource('incident-form-details', IncidentFormDetailController::class);
+
+    // Log Activity Routes
+    Route::get('log-activities', [LogActivityController::class, 'index']);
 });

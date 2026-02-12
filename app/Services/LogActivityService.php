@@ -31,4 +31,24 @@ class LogActivityService
             'remark' => $remark,
         ]);
     }
+
+    public function paginate(?string $search = null, int $perPage = 10, bool $skipLog = false)
+    {
+        $query = LogActivity::with('user')->latest();
+        $remark = $this->generateRemark(ActivityType::LIST, 'Log Activities');
+
+        if ($search) {
+            $query->where('remark', 'like', '%' . $search . '%')
+                  ->orWhereHas('user', function ($q) use ($search) {
+                      $q->where('username', 'like', '%' . $search . '%');
+                  });
+            $remark = $this->generateRemark(ActivityType::SEARCH, 'Log Activity', $search);
+        }
+
+        if (!$skipLog) {
+            $this->log($remark);
+        }
+
+        return $query->paginate($perPage);
+    }
 }
