@@ -75,14 +75,16 @@ class UserService
         }
 
         $updateData = [
-            'username' => $data['username'],
-            'email' => $data['email'],
-            'role_id' => $data['role_id'],
-            'department_id' => $data['department_id'],
-            'is_active' => $data['is_active'] ?? $user->is_active,
-            'updated_by' => Auth::id(),
+            'username'            => $data['username'],
+            'email'               => $data['email'],
+            'role_id'             => $data['role_id'],
+            'department_id'       => $data['department_id'],
+            'is_active'           => $data['is_active'] ?? $user->is_active,
+            'updated_by'          => Auth::id(),
+            'updated_at'          => now(),
+            'last_login'          => isset($data['last_login']) ? strtotime($data['last_login']) : $user->last_login,
         ];
-
+print_r($updateData);
         if (isset($data['password']) && !empty($data['password'])) {
             $updateData['password'] = Hash::make($data['password']);
         }
