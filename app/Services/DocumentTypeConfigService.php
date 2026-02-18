@@ -34,12 +34,12 @@ class DocumentTypeConfigService
     public function create(array $data): DocumentTypeConfig
     {
         $config = DocumentTypeConfig::create([
-            'type' => $data['type'],
-            'document_name' => $data['document_name'],
-            'approval' => $data['approval'] ?? false,
-            'setting' => $data['setting'] ?? null,
-            'is_active' => $data['is_active'] ?? 1,
-            'created_by' => Auth::id(),
+            'type'               => $data['type'],
+            'document_name'      => $data['document_name'],
+            'approval'           => $data['approval'] ?? false,
+            'setting'            => isset($data['setting']) ? json_decode($data['setting'], true) : null,
+            'is_active'          => $data['is_active'] ?? 1,
+            'created_by'         => Auth::id(),
         ]);
 
         $this->logActivityService->log(
@@ -74,7 +74,9 @@ class DocumentTypeConfigService
             'type' => $data['type'],
             'document_name' => $data['document_name'],
             'approval' => $data['approval'] ?? $config->approval,
-            'setting' => $data['setting'] ?? $config->setting,
+            'setting' => array_key_exists('setting', $data)
+                ? (isset($data['setting']) ? json_decode($data['setting'], true) : null)
+                : $config->setting,
             'is_active' => $data['is_active'] ?? $config->is_active,
         ]);
 

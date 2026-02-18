@@ -17,7 +17,7 @@ class UpdateDocumentTypeConfigRequest extends FormRequest
             'type' => 'required|string|max:255',
             'document_name' => 'required|string|max:255',
             'approval' => 'boolean',
-            'setting' => 'nullable|array',
+            'setting' => 'nullable|string|json',
             'is_active' => 'integer|in:0,1',
         ];
     }
