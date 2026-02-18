@@ -20,7 +20,8 @@ class UpdateUserRequest extends FormRequest
             'role_id'         => 'required|exists:roles,id',
             'department_id'   => 'required|exists:departments,id',
             'is_active'       => 'boolean',
-            'password'        => 'nullable|string|min:6'
+            'password'        => 'nullable|string|min:6',
+            'last_login'      => 'nullable',
         ];
     }
 }

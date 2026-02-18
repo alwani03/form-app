@@ -82,9 +82,9 @@ class UserService
             'is_active'           => $data['is_active'] ?? $user->is_active,
             'updated_by'          => Auth::id(),
             'updated_at'          => now(),
-            'last_login'          => isset($data['last_login']) ? strtotime($data['last_login']) : $user->last_login,
+            'last_login'          => $data['last_login'] ?? $user->last_login,
         ];
-print_r($updateData);
+
         if (isset($data['password']) && !empty($data['password'])) {
             $updateData['password'] = Hash::make($data['password']);
         }

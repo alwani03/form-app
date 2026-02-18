@@ -64,7 +64,7 @@ public function index(Request $request)
     public function update(UpdateUserRequest $request, $id)
     {
         $user = $this->userService->update($id, $request->validated());
-
+        // print_r($user);die();
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
