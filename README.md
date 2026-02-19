@@ -93,7 +93,8 @@ Access the application at: `http://localhost:8000`
 
 The database seeder creates a default administrator account:
 
-- **Email**: `alwani@example.com`
+- **Username**: `alwani`
+- **Email**: `achmad.alwani@pinjamyuk.co.id`
 - **Password**: `password`
 - **Role**: `admin`
 - **Department**: `IT`
