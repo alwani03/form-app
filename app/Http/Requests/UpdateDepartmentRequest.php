@@ -15,6 +15,7 @@ class UpdateDepartmentRequest extends FormRequest
     {
         return [
             'department_name' => 'required|string|max:255|unique:departments,department_name,' . $this->route('department'),
+            'department_head_id' => 'nullable|exists:users,id',
         ];
     }
 }

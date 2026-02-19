@@ -29,10 +29,11 @@ class DepartmentService
         return $query->paginate($perPage);
     }
 
-    public function create(string $departmentName): Department
+    public function create(string $departmentName, ?int $departmentHeadId = null): Department
     {
         $department = Department::create([
             'department_name' => $departmentName,
+            'department_head_id' => $departmentHeadId,
             'created_by' => Auth::id(),
         ]);
 
@@ -55,7 +56,7 @@ class DepartmentService
         return $department;
     }
 
-    public function update(int $id, string $departmentName): ?Department
+    public function update(int $id, string $departmentName, ?int $departmentHeadId = null): ?Department
     {
         $department = Department::find($id);
         if (!$department) {
@@ -64,6 +65,7 @@ class DepartmentService
 
         $department->update([
             'department_name' => $departmentName,
+            'department_head_id' => $departmentHeadId,
         ]);
 
         $this->logActivityService->log(

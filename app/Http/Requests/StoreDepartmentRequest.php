@@ -15,6 +15,7 @@ class StoreDepartmentRequest extends FormRequest
     {
         return [
             'department_name' => 'required|string|max:255|unique:departments,department_name',
+            'department_head_id' => 'nullable|exists:users,id',
         ];
     }
 }

@@ -35,7 +35,11 @@ class DepartmentController extends Controller
      */
     public function store(StoreDepartmentRequest $request)
     {
-        $department = $this->departmentService->create($request->validated()['department_name']);
+        $validated = $request->validated();
+        $department = $this->departmentService->create(
+            $validated['department_name'],
+            $validated['department_head_id'] ?? null
+        );
 
         return response()->json([
             'message' => 'Department created successfully',
@@ -65,7 +69,12 @@ class DepartmentController extends Controller
      */
     public function update(UpdateDepartmentRequest $request, $id)
     {
-        $department = $this->departmentService->update($id, $request->validated()['department_name']);
+        $validated = $request->validated();
+        $department = $this->departmentService->update(
+            $id,
+            $validated['department_name'],
+            $validated['department_head_id'] ?? null
+        );
 
         if (!$department) {
             return response()->json(['message' => 'Department not found'], 404);
