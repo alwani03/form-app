@@ -45,6 +45,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
     // Master Menu Routes
     Route::apiResource('master-menus', MasterMenuController::class);
+    
 
     // Incident Form Detail Routes
     Route::put('incident-form-details/{id}/process', [IncidentFormDetailController::class, 'process']);
